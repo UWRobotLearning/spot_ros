@@ -382,18 +382,23 @@ class SpotROS:
         back_image_msg, back_camera_info = bosdyn_data_to_image_and_camera_info_msgs(
             image_bundle.back, self.spot_wrapper
         )
+        hand_image_msg, hand_camera_info = bosdyn_data_to_image_and_camera_info_msgs(
+            image_bundle.hand, self.spot_wrapper
+        )
 
         self.frontleft_image_pub.publish(frontleft_image_msg)
         self.frontright_image_pub.publish(frontright_image_msg)
         self.left_image_pub.publish(left_image_msg)
         self.right_image_pub.publish(right_image_msg)
         self.back_image_pub.publish(back_image_msg)
+        self.hand_image_color_pub.publish(hand_image_msg)
 
         self.frontleft_image_info_pub.publish(frontleft_camera_info)
         self.frontright_image_info_pub.publish(frontright_camera_info)
         self.left_image_info_pub.publish(left_camera_info)
         self.right_image_info_pub.publish(right_camera_info)
         self.back_image_info_pub.publish(back_camera_info)
+        self.hand_image_color_info_pub.publish(hand_camera_info)
 
         self.populate_camera_static_transforms(image_bundle.frontleft)
         self.populate_camera_static_transforms(image_bundle.frontright)
@@ -414,7 +419,10 @@ class SpotROS:
             results: FutureWrapper object of AsyncPeriodicQuery callback
         """
         data = self.spot_wrapper.hand_images
+        print('='*50)
+        print('HandImageCB')
         if data:
+            print('got data')
             image_msg0, camera_info_msg0 = GetImageMsg(data[0], self.spot_wrapper)
             self.hand_image_mono_pub.publish(image_msg0)
             self.hand_image_mono_info_pub.publish(camera_info_msg0)
@@ -2039,6 +2047,7 @@ class SpotROS:
             callbacks=self.callbacks,
             use_take_lease=self.use_take_lease,
             get_lease_on_action=self.get_lease_on_action,
+            port=None,
         )
 
         if not self.spot_wrapper.is_valid:
