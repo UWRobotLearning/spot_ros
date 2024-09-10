@@ -2047,6 +2047,7 @@ class SpotROS:
             callbacks=self.callbacks,
             use_take_lease=self.use_take_lease,
             get_lease_on_action=self.get_lease_on_action,
+            port=None,
         )
 
         if not self.spot_wrapper.is_valid:
