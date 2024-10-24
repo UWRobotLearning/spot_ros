@@ -400,6 +400,7 @@ class SpotROS:
         self.back_image_info_pub.publish(back_camera_info)
         self.hand_image_color_info_pub.publish(hand_camera_info)
 
+        self.populate_camera_static_transforms(image_bundle.hand)
         self.populate_camera_static_transforms(image_bundle.frontleft)
         self.populate_camera_static_transforms(image_bundle.frontright)
         self.populate_camera_static_transforms(image_bundle.left)
