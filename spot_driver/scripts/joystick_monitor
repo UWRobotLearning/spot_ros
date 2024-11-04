@@ -3,17 +3,39 @@
 import rospy
 from std_msgs.msg import Bool
 from sensor_msgs.msg import Joy
+from std_srvs.srv import Trigger
 
 class JoystickMonitor:
     def __init__(self):
         # Retrieve parameters with default values if they are not provided
         self.joystick_timeout = rospy.Duration(rospy.get_param("~joystick_timeout", 1.0))
         self.deadman_button = rospy.get_param("~deadman_button", 4)
+        self.sit_stand_button = rospy.get_param("~sit_button", 0)
+        self.claim_release_button = rospy.get_param("~claim_release_button", 3)
+        self.power_on_off_button = rospy.get_param("~power_on_button", 2)
         self.joystick_topic = rospy.get_param("~joystick_topic", "/joy")
         self.emergency_stop_topic = rospy.get_param("~emergency_stop_topic", "/deadman_stop")
 
         self.last_joy_msg_time = rospy.Time.now()
         self.deadman_pressed = False
+        self.sit_stand_button_pressed = False
+        self.claim_release_button_pressed = False
+        self.power_on_off_button_pressed = False
+        self.service_time = rospy.Time.now()
+        
+        # Service proxies
+        rospy.wait_for_service("/spot/sit")
+        self.sit_service = rospy.ServiceProxy("/spot/sit", Trigger)
+        rospy.wait_for_service("/spot/stand")
+        self.stand_service = rospy.ServiceProxy("/spot/stand", Trigger)
+        rospy.wait_for_service("/spot/claim")
+        self.claim_service = rospy.ServiceProxy("/spot/claim", Trigger)
+        rospy.wait_for_service("/spot/release")
+        self.release_service = rospy.ServiceProxy("/spot/release", Trigger)
+        rospy.wait_for_service("/spot/power_on")
+        self.power_on_service = rospy.ServiceProxy("/spot/power_on", Trigger)
+        rospy.wait_for_service("/spot/power_off")
+        self.power_off_service = rospy.ServiceProxy("/spot/power_off", Trigger)
 
         # Publisher for emergency stop
         self.emergency_stop_pub = rospy.Publisher(self.emergency_stop_topic, Bool, queue_size=1)
@@ -34,6 +56,36 @@ class JoystickMonitor:
         else:
             rospy.logwarn("Invalid deadman button index specified. Check your parameter settings.")
             self.deadman_pressed = False
+
+        # Check if the sit/stand button is pressed
+        self.call_service(msg, self.sit_stand_button, self.sit_stand_button_pressed, self.sit_service)
+        self.call_service(msg, self.sit_stand_button, self.sit_stand_button_pressed, self.stand_service, undo=True)
+
+        # Check if the claim/release button is pressed
+        self.call_service(msg, self.claim_release_button, self.claim_release_button_pressed, self.claim_service)
+        self.call_service(msg, self.claim_release_button, self.claim_release_button_pressed, self.release_service, undo=True)
+
+        # Check if the power on/off button is pressed
+        self.call_service(msg, self.power_on_off_button, self.power_on_off_button_pressed, self.power_on_service)
+        self.call_service(msg, self.power_on_off_button, self.power_on_off_button_pressed, self.power_off_service, undo=True)
+
+    def call_service(self, msg, button_idx, button_pressed, service, undo=False):
+        # UNDO + R7 = opposite of original command eg. sit/stand
+        if msg.header.stamp - self.service_time < rospy.Duration(1.0):
+            return
+        if 0 <= button_idx < len(msg.buttons):
+            if msg.buttons[button_idx] == 1 and not button_pressed and ((not undo and msg.buttons[7]==0) or (undo and msg.buttons[7]==1)):
+                self.service_time = msg.header.stamp
+                button_pressed = True
+                rospy.loginfo(f"Calling service {service.resolved_name}...")
+                try:
+                    response = service()
+                except:
+                    pass
+        else:
+            rospy.logwarn("Invalid button index specified. Check your parameter settings.")
+        button_pressed = False
+
 
     def check_timeout(self, event):
         # Check if the time since the last joystick message exceeds the timeout or if deadman is not pressed
