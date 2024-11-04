@@ -54,14 +54,20 @@
 # Accel x          7
 # Accel y          6
 # Accel z          8
+#
+joystick_monitor:
+  joystick_timeout: 0.5
+  deadman_button: 4
+  joystick_topic: "joy"
+  emergency_stop_topic: "/deadman_stop"
 
 teleop_twist_joy:
   axis_linear:
     x: 1
     y: 0
   scale_linear:
-    x: 0.4
-    y: 0.4
+    x: 1.0
+    y: 1.0
   scale_linear_turbo:
     x: 2.0 # TODO: should this be 1.0?
     y: 2.0 # TODO: should this be 1.0?
@@ -71,8 +77,8 @@ teleop_twist_joy:
     yaw: 1.4 # TODO: should this be 1.0?
   scale_angular_turbo:
     yaw: 1.4 # TODO: should this be 1.0?
-  enable_button: 4
-  enable_turbo_button: 5
+  enable_button: 5
+  enable_turbo_button: -1
 joy_node:
   deadzone: 0.1 # TODO: should this be 0.02?
   autorepeat_rate: 20

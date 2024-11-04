@@ -1,3 +1,9 @@
+locks: 
+- name: "deadman_stop"
+  topic: "/deadman_stop"
+  timeout: 1.0 # After msg stops sending, keep lock for this amount of time
+  priority: 5
+
 topics:
 - name    : bt_joy
   topic   : bluetooth_teleop/cmd_vel
@@ -11,4 +17,3 @@ topics:
   topic   : cmd_vel
   timeout : 0.5
   priority: 1
-locks: []
