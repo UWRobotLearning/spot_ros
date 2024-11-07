@@ -1,0 +1,6 @@
+<launch>
+  <include file="$(find lrn_ros)/launch/lrn_ros.launch">
+    <arg name="param_file" value="spot" />
+  </include>
+
+</launch>

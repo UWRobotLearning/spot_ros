@@ -1,0 +1,30 @@
+<launch>
+  <arg name="driver_delay" value="120" />
+  <arg name="nav_man_delay" value="120" />
+  <arg name="autonomy_delay" value="135" />
+
+  <include file="$(find timed_roslaunch)/launch/timed_roslaunch.launch">
+    <arg name="time" value="$(arg driver_delay)" />
+    <arg name="pkg" value="spot_driver" />
+    <arg name="file" value="driver.launch" />
+  </include>
+
+  <include file="$(find timed_roslaunch)/launch/timed_roslaunch.launch">
+    <arg name="time" value="$(arg nav_man_delay)" />
+    <arg name="pkg" value="spot_nav" />
+    <arg name="file" value="spot_nav.launch" />
+  </include>
+
+  <include file="$(find timed_roslaunch)/launch/timed_roslaunch.launch">
+    <arg name="time" value="$(arg nav_man_delay)" />
+    <arg name="pkg" value="mavros" />
+    <arg name="file" value="apm.launch" />
+  </include>
+
+  <include file="$(find timed_roslaunch)/launch/timed_roslaunch.launch">
+    <arg name="time" value="$(arg autonomy_delay)" />
+    <arg name="pkg" value="spot_driver" />
+    <arg name="file" value="autonomy.launch" />
+  </include>
+
+</launch>
