@@ -363,7 +363,7 @@ def GetFeetFromState(
 
 
 def GetOdomTwistFromState(
-    state: robot_state_pb2.RobotState, spot_wrapper: SpotWrapper
+        state: robot_state_pb2.RobotState, spot_wrapper: SpotWrapper, use_vision: bool
 ) -> TwistWithCovarianceStamped:
     """Maps odometry data from robot state proto to ROS TwistWithCovarianceStamped message
 
@@ -377,24 +377,29 @@ def GetOdomTwistFromState(
     local_time = spot_wrapper.robotToLocalTime(
         state.kinematic_state.acquisition_timestamp
     )
+    if use_vision:
+        vel = state.kinematic_state.velocity_of_body_in_vision
+    else:
+        vel = state.kinematic_state.velocity_of_body_in_odom
+
     twist_odom_msg.header.stamp = rospy.Time(local_time.seconds, local_time.nanos)
     twist_odom_msg.twist.twist.linear.x = (
-        state.kinematic_state.velocity_of_body_in_odom.linear.x
+        vel.linear.x
     )
     twist_odom_msg.twist.twist.linear.y = (
-        state.kinematic_state.velocity_of_body_in_odom.linear.y
+        vel.linear.y
     )
     twist_odom_msg.twist.twist.linear.z = (
-        state.kinematic_state.velocity_of_body_in_odom.linear.z
+        vel.linear.z
     )
     twist_odom_msg.twist.twist.angular.x = (
-        state.kinematic_state.velocity_of_body_in_odom.angular.x
+        vel.angular.x
     )
     twist_odom_msg.twist.twist.angular.y = (
-        state.kinematic_state.velocity_of_body_in_odom.angular.y
+        vel.angular.y
     )
     twist_odom_msg.twist.twist.angular.z = (
-        state.kinematic_state.velocity_of_body_in_odom.angular.z
+        vel.angular.z
     )
     return twist_odom_msg
 
@@ -498,7 +503,7 @@ def GetOdomFromState(
     pose_odom_msg.pose.orientation.w = tform_body.rotation.w
 
     odom_msg.pose = pose_odom_msg
-    twist_odom_msg = GetOdomTwistFromState(state, spot_wrapper).twist
+    twist_odom_msg = GetOdomTwistFromState(state, spot_wrapper, use_vision=use_vision).twist
     odom_msg.twist = twist_odom_msg
     return odom_msg
 

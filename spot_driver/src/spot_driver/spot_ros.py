@@ -181,11 +181,11 @@ class SpotROS:
             self.last_tf_msg = tf_msg
 
             # Odom Twist #
-            twist_odom_msg = GetOdomTwistFromState(state, self.spot_wrapper)
+            use_vision = self.mode_parent_odom_tf == "vision"
+            twist_odom_msg = GetOdomTwistFromState(state, self.spot_wrapper, use_vision)
             self.odom_twist_pub.publish(twist_odom_msg)
 
             # Odom #
-            use_vision = self.mode_parent_odom_tf == "vision"
             odom_msg = GetOdomFromState(
                 state,
                 self.spot_wrapper,
