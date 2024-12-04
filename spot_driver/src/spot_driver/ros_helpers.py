@@ -583,6 +583,7 @@ def GetTFFromState(
         if state.kinematic_state.transforms_snapshot.child_to_parent_edge_map.get(
             frame_name
         ).parent_frame_name:
+
             try:
                 transform = state.kinematic_state.transforms_snapshot.child_to_parent_edge_map.get(
                     frame_name
@@ -610,6 +611,7 @@ def GetTFFromState(
                     )
                 tf_msg.transforms.append(new_tf)
             except Exception as e:
+                print(e)
                 spot_wrapper.logger.error("Error: {}".format(e))
 
     return tf_msg

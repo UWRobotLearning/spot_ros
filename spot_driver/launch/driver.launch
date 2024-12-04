@@ -13,7 +13,6 @@
 
   <include file="$(find spot_description)/launch/description.launch" />
   <include file="$(find spot_driver)/launch/control.launch" />
-  <include file="$(find spot_driver)/launch/accessories.launch" />
 
   <node pkg="spot_driver" type="spot_ros" name="spot_ros"  ns="spot" output="screen">
     <rosparam file="$(arg driver_config)" command="load" />
@@ -34,6 +33,10 @@
   <node pkg="twist_mux" type="twist_mux" name="twist_mux" >
     <rosparam command="load" file="$(find spot_driver)/config/twist_mux.yaml" />
     <remap from="cmd_vel_out" to="spot/cmd_vel"/>
+  </node>
+
+  <node pkg="spot_driver" type="goal_mux" name="goal_mux"  ns="spot" output="screen">
+    <rosparam command="load" file="$(find spot_driver)/config/goal_mux.yaml" />
   </node>
 
 </launch>

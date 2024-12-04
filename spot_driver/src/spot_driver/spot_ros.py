@@ -461,6 +461,7 @@ class SpotROS:
         Args:
             results: FutureWrapper object of AsyncPeriodicQuery callback
         """
+        return # Turning off world objects so they don't interfer with TF tree
         data = self.spot_wrapper.world_objects
         if data:
             world_objects_msg = GetWorldObjectsMsg(data, self.spot_wrapper)
