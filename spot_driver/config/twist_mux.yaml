@@ -10,6 +10,6 @@ topics:
   timeout : 0.5
   priority: 9
 - name    : external
-  topic   : cmd_vel
+  topic   : /spot/cmd_vel_auto
   timeout : 0.5
   priority: 1
